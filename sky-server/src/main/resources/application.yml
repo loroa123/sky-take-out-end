@@ -1,8 +1,9 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   profiles:
+    #开启了dev这个配置，所以dev的yml也生效
     active: dev
   main:
     allow-circular-references: true
@@ -11,7 +12,8 @@ spring:
       driver-class-name: ${sky.datasource.driver-class-name}
       url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: ${sky.datasource.username}
-      password: ${sky.datasource.password}
+#      password: ${sky.datasource.password}
+      password:
   redis:
     host: ${sky.redis.host}
     port: ${sky.redis.port}
@@ -35,6 +37,13 @@ logging:
         controller: info
 
 sky:
+  datasource:
+    driver-class-name: om.mysql.cj.jdbc.Driver
+    port: 3306
+    database: sky_take_out
+    username: root
+    password:
+
   jwt:
     # 设置jwt签名加密时使用的秘钥
     admin-secret-key: itcast

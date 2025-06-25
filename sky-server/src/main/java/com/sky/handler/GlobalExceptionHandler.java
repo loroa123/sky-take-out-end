@@ -17,6 +17,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class GlobalExceptionHandler {
 
     /**
+     * 全局的异常都在这里捕获
      * 捕获业务异常
      * @param ex
      * @return
@@ -28,7 +29,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理SQL异常
+     * 处理SQL异常.比如重名了
      * @param ex
      * @return
      */

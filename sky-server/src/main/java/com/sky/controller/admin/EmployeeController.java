@@ -31,6 +31,7 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+    //通过注解将jwt从yml封装的配置注入现在的
     @Autowired
     private JwtProperties jwtProperties;
 
@@ -47,21 +48,25 @@ public class EmployeeController {
 
         Employee employee = employeeService.login(employeeLoginDTO);
 
-        //登录成功后，生成jwt令牌
+        //登录成功后，生成jwt令牌（给前端））
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.EMP_ID, employee.getId());
+        //jwtUtil是生成令牌的类
         String token = JwtUtil.createJWT(
+                //jwtProperties是配置属性类，上面autowire注入进来的
                 jwtProperties.getAdminSecretKey(),
+                //过期时间
                 jwtProperties.getAdminTtl(),
                 claims);
 
+        //通过builder构建器调用属性来封装——EmployeeLoginVO对象必须先加入builder注解@Builder
         EmployeeLoginVO employeeLoginVO = EmployeeLoginVO.builder()
                 .id(employee.getId())
                 .userName(employee.getUsername())
                 .name(employee.getName())
                 .token(token)
                 .build();
-
+        //把vo封装到result，整体返回前端
         return Result.success(employeeLoginVO);
     }
 
@@ -85,6 +90,7 @@ public class EmployeeController {
     @ApiOperation("新增员工")
     public Result save(@RequestBody EmployeeDTO employeeDTO){
         log.info("新增员工：{}",employeeDTO);
+        log.info("save 当前线程的id是：" + Thread.currentThread().getId());
         employeeService.save(employeeDTO);
         return Result.success();
     }

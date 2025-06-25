@@ -17,6 +17,7 @@ public interface EmployeeMapper {
      * @param username
      * @return
      */
+    //简单的（非sql动态标签）可以注解来写,mybatis里有说过
     @Select("select * from employee where username = #{username}")
     Employee getByUsername(String username);
 

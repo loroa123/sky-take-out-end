@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "sky.jwt")
 @Data
+//springboot的配置属性类在这里被封装为java对象
 public class JwtProperties {
 
     /**
