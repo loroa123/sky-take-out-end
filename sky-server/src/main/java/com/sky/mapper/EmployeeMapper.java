@@ -31,12 +31,6 @@ public interface EmployeeMapper {
     @AutoFill(value = OperationType.INSERT)
     void insert(Employee employee);
 
-    /**
-     * 分页查询
-     * @param employeePageQueryDTO
-     * @return
-     */
-    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
     /**
      * 根据主键动态修改属性
@@ -52,4 +46,11 @@ public interface EmployeeMapper {
      */
     @Select("select * from employee where id = #{id}")
     Employee getById(Long id);
+
+    /**
+     * 分页查询的方法。动态sql不使用注解使用映射文件
+     * @param employeePageQueryDTO
+     * @return
+     */
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 }

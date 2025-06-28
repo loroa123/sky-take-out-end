@@ -96,16 +96,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * 分页查询
+     * 分页查询  的实现方法
      *
      * @param employeePageQueryDTO
      * @return
      */
+    @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        // select * from employee limit 0,10
+        //select * from emplyee limit 0,10
+        //这里使用了mybatis插件pagehelper，所以查询的限制参数可以动态拼接进去。mysql的limit关键字
         //开始分页查询
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
+        //编写查询的方法.插件要求返回的结果符合他的规则
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
         long total = page.getTotal();

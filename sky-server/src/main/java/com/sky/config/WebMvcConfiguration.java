@@ -102,7 +102,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     /**
-     * 扩展Spring MVC框架的消息转化器
+     * 扩展Spring MVC框架的消息转化器.统一转换后端给前端的数据的格式。
+     * 比如时分秒的格式@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
      * @param converters
      */
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -111,7 +112,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         //需要为消息转换器设置一个对象转换器，对象转换器可以将Java对象序列化为json数据
         converter.setObjectMapper(new JacksonObjectMapper());
-        //将自己的消息转化器加入容器中
-        converters.add(0,converter);
+        //将自己的消息转化器加入容器中.加入索引0后是希望自己的自定义转换器排在第一位
+        converters.add(0, converter);
     }
 }
