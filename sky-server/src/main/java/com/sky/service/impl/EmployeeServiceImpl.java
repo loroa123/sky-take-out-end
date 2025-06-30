@@ -124,6 +124,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param id
      */
     public void startOrStop(Integer status, Long id) {
+        // 动态写这个sql语句能够多个字段修改
         // update employee set status = ? where id = ?
 
         /*Employee employee = new Employee();
@@ -135,17 +136,18 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .id(id)
                 .build();
 
+        //动态更新给了一个实体类
         employeeMapper.update(employee);
     }
 
     /**
      * 根据id查询员工
-     *
      * @param id
      * @return
      */
     public Employee getById(Long id) {
         Employee employee = employeeMapper.getById(id);
+        //返回的加密密码也不给前端，只返回****
         employee.setPassword("****");
         return employee;
     }
@@ -156,11 +158,13 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeeDTO
      */
     public void update(EmployeeDTO employeeDTO) {
+        //之前编写了动态更改的updata，但是mapper里定义的是employee接受，这边是employeeDTO
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        //employee.setUpdateTime(LocalDateTime.now());
-        //employee.setUpdateUser(BaseContext.getCurrentId());
+        //修改更新时间。在每次请求拦截器里就thradlocal了
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }

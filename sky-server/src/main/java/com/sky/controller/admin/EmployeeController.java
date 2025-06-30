@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -116,23 +117,29 @@ public class EmployeeController {
      * @param status
      * @param id
      * @return
+     * result 是一个结果返回的范型
+     * @PathVariable("status") 表示是路径里的传参。名称一样省略了
      */
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用员工账号")
-    public Result startOrStop(@PathVariable Integer status,Long id){
-        log.info("启用禁用员工账号：{},{}",status,id);
-        employeeService.startOrStop(status,id);
+    public Result startOrStop(@PathVariable Integer status, Long id){
+        log.info("启用禁用员工账号：{}, {}", status, id);
+        employeeService.startOrStop(status, id);
         return Result.success();
     }
 
     /**
-     * 根据id查询员工信息
+     * mapper——持久层
+     * service——业务层
+     * controler——控制层
+     *
+     * 编辑员工信息
      * @param id
      * @return
      */
     @GetMapping("/{id}")
     @ApiOperation("根据id查询员工信息")
-    public Result<Employee> getById(@PathVariable Long id){
+    public Result<Employee> getById(@PathVariable long id){
         Employee employee = employeeService.getById(id);
         return Result.success(employee);
     }
