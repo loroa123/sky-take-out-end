@@ -29,6 +29,7 @@ public class CommonController {
 
     /**
      * 文件上传
+     * 将文件上传到阿里云服务器
      * @param file
      * @return
      */
@@ -42,7 +43,7 @@ public class CommonController {
             String originalFilename = file.getOriginalFilename();
             //截取原始文件名的后缀   dfdfdf.png
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            //构造新文件名称
+            //构造新文件名称，用uuid来防止重名（重命名了
             String objectName = UUID.randomUUID().toString() + extension;
 
             //文件的请求路径

@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 @Slf4j
 public class AliOssUtil {
 
+    //在service的配置类config里面初始化
     private String endpoint;
     private String accessKeyId;
     private String accessKeySecret;

@@ -26,6 +26,7 @@ import java.util.Set;
 @Slf4j
 public class DishController {
 
+    // 注入service
     @Autowired
     private DishService dishService;
     @Autowired
@@ -33,7 +34,7 @@ public class DishController {
 
     /**
      * 新增菜品
-     *
+     *业务层在service里面
      * @param dishDTO
      * @return
      */

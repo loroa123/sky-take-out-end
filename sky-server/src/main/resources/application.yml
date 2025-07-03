@@ -3,7 +3,8 @@ server:
 
 spring:
   profiles:
-    #开启了dev这个配置，所以dev的yml也生效
+    #开启了dev这个配置，所以dev的yml也生效。
+    # 改成prod就从开发到生产环境了
     active: dev
   main:
     allow-circular-references: true
@@ -13,7 +14,7 @@ spring:
       url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: ${sky.datasource.username}
 #      password: ${sky.datasource.password}
-      password:
+      password: ${sky.datasource.password}
   redis:
     host: ${sky.redis.host}
     port: ${sky.redis.port}
@@ -42,7 +43,7 @@ sky:
     port: 3306
     database: sky_take_out
     username: root
-    password:
+    password: mysql010203
 
   jwt:
     # 设置jwt签名加密时使用的秘钥
@@ -54,6 +55,7 @@ sky:
     user-secret-key: itheima
     user-ttl: 7200000
     user-token-name: authentication
+  # 用于配置来源的资源
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}

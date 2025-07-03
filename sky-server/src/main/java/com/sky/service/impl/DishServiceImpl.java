@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+//service的注解
 @Service
 @Slf4j
 public class DishServiceImpl implements DishService {
@@ -41,7 +42,8 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 新增菜品和对应的口味
-     *
+     * 口味数据，口味可能有多个
+     * @Transactional 是事务注解-数据表的操作需要保证数据一致性
      * @param dishDTO
      */
     @Transactional
@@ -49,16 +51,18 @@ public class DishServiceImpl implements DishService {
 
         Dish dish = new Dish();
 
+        //dto和dish内部属性的名字应该对应
         BeanUtils.copyProperties(dishDTO, dish);
 
         //向菜品表插入1条数据
         dishMapper.insert(dish);
 
-        //获取insert语句生成的主键值
+        //获取insert语句生成的主键值 keyProperty="id"
         Long dishId = dish.getId();
 
         List<DishFlavor> flavors = dishDTO.getFlavors();
         if (flavors != null && flavors.size() > 0) {
+            //一次性传入对象，进行批量插入 forEach。多个flavors会插入这次的单个菜品的id
             flavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishId);
             });

@@ -11,6 +11,7 @@ import java.util.List;
 public interface DishFlavorMapper {
     /**
      * 批量插入口味数据
+     * 语法写在xml映射文件里
      * @param flavors
      */
     void insertBatch(List<DishFlavor> flavors);

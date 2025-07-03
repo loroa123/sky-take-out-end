@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * 配置类，用于创建AliOssUtil对象
+ * 从配置里读取aliOssProperties
+ * @Bean 会使初始化时将它初始化创建对象交给spring去管理
+ * @ConditionalOnMissingBean 保证在spring里唯一
  */
 @Configuration
 @Slf4j
