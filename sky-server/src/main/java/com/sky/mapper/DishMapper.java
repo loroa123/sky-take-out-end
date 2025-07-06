@@ -88,4 +88,10 @@ public interface DishMapper {
      * @return
      */
     Integer countByMap(Map map);
+
+    /**
+     * 批量删除菜品
+     * @param ids
+     */
+    void deleteByIds(List<Long> ids);
 }
