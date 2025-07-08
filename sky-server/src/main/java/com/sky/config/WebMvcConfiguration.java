@@ -49,6 +49,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/user/shop/status");
     }
 
+    //接口文档里面扫描不同的包admin和user来给到不同的
     @Bean
     public Docket docket(){
         log.info("准备生成接口文档...");
