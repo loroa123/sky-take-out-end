@@ -18,7 +18,7 @@ public interface UserMapper {
     User getByOpenid(String openid);
 
     /**
-     * 插入数据
+     * 插入数据  在mapper里面
      * @param user
      */
     void insert(User user);

@@ -43,12 +43,14 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
 
+        // 因为微信小程序端获取店铺状态在登陆之前所以也要例外
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**")
                 .excludePathPatterns("/user/user/login")
                 .excludePathPatterns("/user/shop/status");
     }
 
+    //接口文档里面扫描不同的包admin和user来给到不同的
     @Bean
     public Docket docket(){
         log.info("准备生成接口文档...");

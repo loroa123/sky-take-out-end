@@ -31,6 +31,7 @@ import java.util.List;
 @Slf4j
 public class DishServiceImpl implements DishService {
 
+    //注入所需的几个mapper
     @Autowired
     private DishMapper dishMapper;
     @Autowired
@@ -73,7 +74,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 菜品分页查询
-     *
+     * 分页查询都是基于PageHelper。mybatis PageHelper.startPage()，插件会自动在 SQL 后追加 LIMIT 子句，无需手动写分页逻辑。
      * @param dishPageQueryDTO
      * @return
      */
@@ -106,12 +107,18 @@ public class DishServiceImpl implements DishService {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
-        //删除菜品表中的菜品数据
+        //删除菜品表中的菜品数据  ids.for
         for (Long id : ids) {
             dishMapper.deleteById(id);
             //删除菜品关联的口味数据
             dishFlavorMapper.deleteByDishId(id);
         }
+        // 可以更新为批量删除而不是for来大量查询
+        // sql: delete from dish where id in (?,?,?)
+        dishMapper.deleteByIds(ids);
+        // sql: delete from dish_flavor where id in (?,?,?)
+        dishFlavorMapper.deleteByDishIds(ids);
+
     }
 
     /**
@@ -144,10 +151,10 @@ public class DishServiceImpl implements DishService {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
 
-        //修改菜品表基本信息
+        //修改菜品表基本信息。不用全传DTO
         dishMapper.update(dish);
 
-        //删除原有的口味数据
+        //删除原有的口味数据。所有口味数据，就不查是删掉还是改写了
         dishFlavorMapper.deleteByDishId(dishDTO.getId());
 
         //重新插入口味数据

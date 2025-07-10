@@ -43,10 +43,10 @@ public class UserServiceImpl implements UserService {
             throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
         }
 
-        //判断当前用户是否为新用户
+        //判断当前用户是否为新用户-对于外卖系统来说。是的话就需要存储（自动完成注册
         User user = userMapper.getByOpenid(openid);
 
-        //如果是新用户，自动完成注册
+        //如果是新用户，自动完成注册。性别年龄手机号无法获取
         if(user == null){
             user = User.builder()
                     .openid(openid)
@@ -67,10 +67,10 @@ public class UserServiceImpl implements UserService {
     private String getOpenid(String code){
         //调用微信接口服务，获得当前微信用户的openid
         Map<String, String> map = new HashMap<>();
-        map.put("appid",weChatProperties.getAppid());
-        map.put("secret",weChatProperties.getSecret());
-        map.put("js_code",code);
-        map.put("grant_type","authorization_code");
+        map.put("appid", weChatProperties.getAppid());
+        map.put("secret", weChatProperties.getSecret());
+        map.put("js_code", code);
+        map.put("grant_type", "authorization_code");
         String json = HttpClientUtil.doGet(WX_LOGIN, map);
 
         JSONObject jsonObject = JSON.parseObject(json);

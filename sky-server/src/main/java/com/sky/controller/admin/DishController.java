@@ -57,7 +57,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/page")
-    @ApiOperation("菜品分页查询")
+    @ApiOperation("菜品分页查询-page")
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
         log.info("菜品分页查询:{}", dishPageQueryDTO);
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
@@ -66,7 +66,8 @@ public class DishController {
 
     /**
      * 菜品批量删除
-     *
+     * 让springmac讲传入的str转化为list
+     * @RequestParam动态解析mac字符串，解析出id
      * @param ids
      * @return
      */
