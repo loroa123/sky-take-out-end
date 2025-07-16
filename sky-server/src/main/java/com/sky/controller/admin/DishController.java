@@ -29,6 +29,7 @@ public class DishController {
     // 注入service
     @Autowired
     private DishService dishService;
+    // 新增菜品，起售停售都需要清理缓存数据，最好是精确清理被修改的菜品的单个catagory
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -78,6 +79,7 @@ public class DishController {
         dishService.deleteBatch(ids);
 
         //将所有的菜品缓存数据清理掉，所有以dish_开头的key
+        // 这边的逻辑是不管批量删除还是单个删除都全清缓存。处理一下通配符
         cleanCache("dish_*");
 
         return Result.success();
@@ -128,6 +130,7 @@ public class DishController {
         dishService.startOrStop(status, id);
 
         //将所有的菜品缓存数据清理掉，所有以dish_开头的key
+        // 全删的逻辑是如果要精确删除对应的dish_id其实又需要一次查询操作，效率层面得不偿失
         cleanCache("dish_*");
 
         return Result.success();
@@ -152,6 +155,7 @@ public class DishController {
      */
     private void cleanCache(String pattern){
         Set keys = redisTemplate.keys(pattern);
+        //支持按照传进来的集合来删除keys
         redisTemplate.delete(keys);
     }
 }

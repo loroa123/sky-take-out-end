@@ -22,12 +22,13 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    // 要使用redis缓存菜品所以先注入redis的template
     @Autowired
     private RedisTemplate redisTemplate;
 
     /**
      * 根据分类id查询菜品
-     *
+     * 使用了缓存
      * @param categoryId
      * @return
      */
@@ -38,7 +39,8 @@ public class DishController {
         //构造redis中的key，规则：dish_分类id
         String key = "dish_" + categoryId;
 
-        //查询redis中是否存在菜品数据
+        //查询redis中是否存在菜品数据，放进去是list，取出来就是list
+        //所以用dishVO来接收
         List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get(key);
         if(list != null && list.size() > 0){
             //如果存在，直接返回，无须查询数据库
@@ -49,7 +51,7 @@ public class DishController {
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
 
-        //如果不存在，查询数据库，将查询到的数据放入redis中
+        //如果不存在，查询数据库，将查询到的数据放入redis中（是list
         list = dishService.listWithFlavor(dish);
         redisTemplate.opsForValue().set(key, list);
 
