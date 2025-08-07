@@ -18,6 +18,7 @@ import java.util.List;
 @Api(tags = "C端购物车相关接口")
 public class ShoppingCartController {
 
+    //通过Autowired将service的接口注入进来
     @Autowired
     private ShoppingCartService shoppingCartService;
 
@@ -27,9 +28,10 @@ public class ShoppingCartController {
      * @return
      */
     @PostMapping("/add")
-    @ApiOperation("添加购物车")
+    @ApiOperation("添加购物车-user")
     public Result add(@RequestBody ShoppingCartDTO shoppingCartDTO){
         log.info("添加购物车，商品信息为：{}",shoppingCartDTO);
+        //真正的业务操作在service里面
         shoppingCartService.addShoppingCart(shoppingCartDTO);
         return Result.success();
     }

@@ -36,10 +36,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void addShoppingCart(ShoppingCartDTO shoppingCartDTO) {
         //判断当前加入到购物车中的商品是否已经存在了
         ShoppingCart shoppingCart = new ShoppingCart();
-        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        // 在线程缓存里拿userid
         Long userId = BaseContext.getCurrentId();
         shoppingCart.setUserId(userId);
 
+        // 这里用list不直接用ShoppingCart是为了后面其他模块复用
         List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
 
         //如果已经存在了，只需要将数量加一
@@ -50,6 +52,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }else {
             //如果不存在，需要插入一条购物车数据
             //判断本次添加到购物车的是菜品还是套餐
+            //不可能同时是菜品和套餐，前端限制了
             Long dishId = shoppingCartDTO.getDishId();
             if(dishId != null){
                 //本次添加到购物车的是菜品
@@ -78,9 +81,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public List<ShoppingCart> showShoppingCart() {
         //获取到当前微信用户的id
         Long userId = BaseContext.getCurrentId();
+        //用builder构造对象
         ShoppingCart shoppingCart = ShoppingCart.builder()
                 .userId(userId)
                 .build();
+        //list的语句mapper常用可以稍微修改后复用
         List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
         return list;
     }

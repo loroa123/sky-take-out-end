@@ -30,7 +30,7 @@ public class SetmealController {
      */
     @GetMapping("/list")
     @ApiOperation("根据分类id查询套餐")
-    @Cacheable(cacheNames = "setmealCache",key = "#categoryId") //key: setmealCache::100
+    @Cacheable(cacheNames = "setmealCache", key = "#categoryId") //key: setmealCache::100.redis会动态计算出这个key来进行存储
     public Result<List<Setmeal>> list(Long categoryId) {
         Setmeal setmeal = new Setmeal();
         setmeal.setCategoryId(categoryId);

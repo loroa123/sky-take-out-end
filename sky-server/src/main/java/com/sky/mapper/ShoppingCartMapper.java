@@ -12,6 +12,7 @@ public interface ShoppingCartMapper {
 
     /**
      * 动态条件查询
+     * 查购物车这个表封装成List实体，里面是ShoppintCart元素，方法名叫做list
      * @param shoppingCart
      * @return
      */

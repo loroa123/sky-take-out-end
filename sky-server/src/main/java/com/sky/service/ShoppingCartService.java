@@ -8,7 +8,7 @@ import java.util.List;
 public interface ShoppingCartService {
 
     /**
-     * 添加购物车
+     * 添加购物车的业务方法
      * @param shoppingCartDTO
      */
     void addShoppingCart(ShoppingCartDTO shoppingCartDTO);
