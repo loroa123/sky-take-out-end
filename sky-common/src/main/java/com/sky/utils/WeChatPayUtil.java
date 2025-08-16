@@ -88,6 +88,7 @@ public class WeChatPayUtil {
         httpPost.addHeader("Wechatpay-Serial", weChatProperties.getMchSerialNo());
         httpPost.setEntity(new StringEntity(body, "UTF-8"));
 
+        //其实最底层还是ihttp请求
         CloseableHttpResponse response = httpClient.execute(httpPost);
         try {
             String bodyAsString = EntityUtils.toString(response.getEntity());
@@ -139,6 +140,7 @@ public class WeChatPayUtil {
         jsonObject.put("out_trade_no", orderNum);
         jsonObject.put("notify_url", weChatProperties.getNotifyUrl());
 
+        //金额使用了嵌套
         JSONObject amount = new JSONObject();
         amount.put("total", total.multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP).intValue());
         amount.put("currency", "CNY");
@@ -151,6 +153,7 @@ public class WeChatPayUtil {
         jsonObject.put("payer", payer);
 
         String body = jsonObject.toJSONString();
+        //主要是封装参数
         return post(JSAPI, body);
     }
 
@@ -164,7 +167,7 @@ public class WeChatPayUtil {
      * @return
      */
     public JSONObject pay(String orderNum, BigDecimal total, String description, String openid) throws Exception {
-        //统一下单，生成预支付交易单
+        //统一下单，生成预支付交易单，bodyAsString是http返回的结果
         String bodyAsString = jsapi(orderNum, total, description, openid);
         //解析返回结果
         JSONObject jsonObject = JSON.parseObject(bodyAsString);
@@ -172,6 +175,7 @@ public class WeChatPayUtil {
 
         String prepayId = jsonObject.getString("prepay_id");
         if (prepayId != null) {
+            // 主要进行解析返回的数据（预支付交易标识）然后增加二次签名，加密
             String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
             String nonceStr = RandomStringUtils.randomNumeric(32);
             ArrayList<Object> list = new ArrayList<>();
@@ -192,7 +196,7 @@ public class WeChatPayUtil {
             signature.update(message);
             String packageSign = Base64.getEncoder().encodeToString(signature.sign());
 
-            //构造数据给微信小程序，用于调起微信支付
+            //构造数据给微信小程序，用于调起微信支付。这些都是微信支付需要的参数
             JSONObject jo = new JSONObject();
             jo.put("timeStamp", timeStamp);
             jo.put("nonceStr", nonceStr);

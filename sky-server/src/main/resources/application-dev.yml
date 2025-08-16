@@ -20,10 +20,12 @@ sky:
   wechat:
     appid: wx5c189346ab1ec92e
     secret: 718f4075960c38e9ad2db0257d2d27eb
+    # 支付相关，但是个人无法申请并获取，写了跳过支付（默认全部成功
     mchid : 1561414331
     mchSerialNo: 4B3B3DC35414AD50B1B755BAF8DE9CC7CF407606
     privateKeyFilePath: D:\pay\apiclient_key.pem
     apiV3Key: CZBK51236435wxpay435434323FFDuv3
     weChatPayCertFilePath: D:\pay\wechatpay_166D96F876F45C7D07CE98952A96EC980368ACFC.pem
+    # 替换为内网穿透之后的临时域名（如果使用），校园网等加了预防内网穿透不可以
     notifyUrl: https://58869fb.r2.cpolar.top/notify/paySuccess
     refundNotifyUrl: https://58869fb.r2.cpolar.top/notify/refundSuccess
