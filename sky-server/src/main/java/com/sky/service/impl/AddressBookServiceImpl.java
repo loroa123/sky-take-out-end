@@ -33,6 +33,7 @@ public class AddressBookServiceImpl implements AddressBookService {
      */
     public void save(AddressBook addressBook) {
         addressBook.setUserId(BaseContext.getCurrentId());
+        //默认新增的地址不是默认地址
         addressBook.setIsDefault(0);
         addressBookMapper.insert(addressBook);
     }
@@ -65,6 +66,7 @@ public class AddressBookServiceImpl implements AddressBookService {
     @Transactional
     public void setDefault(AddressBook addressBook) {
         //1、将当前用户的所有地址修改为非默认地址 update address_book set is_default = ? where user_id = ?
+        //也就是先全部删掉
         addressBook.setIsDefault(0);
         addressBook.setUserId(BaseContext.getCurrentId());
         addressBookMapper.updateIsDefaultByUserId(addressBook);

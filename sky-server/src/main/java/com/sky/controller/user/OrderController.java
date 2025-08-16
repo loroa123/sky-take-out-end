@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class OrderController {
 
+    //注入了service层
     @Autowired
     private OrderService orderService;
 
     /**
      * 用户下单
+     * json格式所以用@RequestBody
      * @param ordersSubmitDTO
      * @return
      */

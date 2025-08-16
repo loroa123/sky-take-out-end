@@ -27,6 +27,7 @@ public class AddressBookController {
     @ApiOperation("查询当前登录用户的所有地址信息")
     public Result<List<AddressBook>> list() {
         AddressBook addressBook = new AddressBook();
+        //动态获得当前微信用户的userid
         addressBook.setUserId(BaseContext.getCurrentId());
         List<AddressBook> list = addressBookService.list(addressBook);
         return Result.success(list);
@@ -103,6 +104,7 @@ public class AddressBookController {
         addressBook.setUserId(BaseContext.getCurrentId());
         List<AddressBook> list = addressBookService.list(addressBook);
 
+        //虽然是一个list但是默认地址只有一条
         if (list != null && list.size() == 1) {
             return Result.success(list.get(0));
         }

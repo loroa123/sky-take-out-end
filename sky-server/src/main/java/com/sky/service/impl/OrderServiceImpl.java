@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrderServiceImpl implements OrderService {
 
+    //注入OrderMapper等interface
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
@@ -56,16 +57,19 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private WebSocketServer webSocketServer;
+    //用一个全局变量orderid存,然后在新建订单里赋值
+    public static long orderId;
 
     /**
      * 用户下单
      * @param ordersSubmitDTO
      * @return
      */
+    //事务注解。方法执行完才会提交
     @Transactional
     public OrderSubmitVO submitOrder(OrdersSubmitDTO ordersSubmitDTO) {
 
-        //1. 处理各种业务异常（地址簿为空、购物车数据为空）
+        //1. 处理各种业务异常（地址簿为空、购物车数据为空）前后端都需要校验数据
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
         if(addressBook == null){
             //抛出业务异常
@@ -82,6 +86,7 @@ public class OrderServiceImpl implements OrderService {
         shoppingCart.setUserId(userId);
         List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
 
+        //如果&&null之后再获取size会报错
         if(shoppingCartList == null || shoppingCartList.size() == 0){
             //抛出业务异常
             throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
@@ -93,7 +98,8 @@ public class OrderServiceImpl implements OrderService {
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayStatus(Orders.UN_PAID);
         orders.setStatus(Orders.PENDING_PAYMENT);
-        orders.setNumber(String.valueOf(System.currentTimeMillis()));
+        //订单号最好是时间戳加userid.或者是因为毫秒级且会按顺序处理并不会冲突
+        orders.setNumber("%s%s".formatted(String.valueOf(System.currentTimeMillis()), String.valueOf(userId)));
         orders.setAddress(addressBook.getDetail());
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
@@ -105,11 +111,14 @@ public class OrderServiceImpl implements OrderService {
         //3. 向订单明细表插入n条数据
         for (ShoppingCart cart : shoppingCartList) {
             OrderDetail orderDetail = new OrderDetail();//订单明细
+            //先直接拷贝订单表和订单明细表相同的。因为属性名称相同
             BeanUtils.copyProperties(cart, orderDetail);
-            orderDetail.setOrderId(orders.getId());//设置当前订单明细关联的订单id
+            //设置当前订单明细关联的订单id。
+            // orders的getId能够成功是因为mapper表里面设置了useGeneratedKeys="true" keyProperty="id"，有返回oders的id
+            orderDetail.setOrderId(orders.getId());
             orderDetailList.add(orderDetail);
         }
-
+        //先存入orderDetailList然后再使用insertBatch来批量插入
         orderDetailMapper.insertBatch(orderDetailList);
 
         //4. 清空当前用户的购物车数据
@@ -208,19 +217,42 @@ public class OrderServiceImpl implements OrderService {
         User user = userMapper.getById(userId);
 
         //调用微信支付接口，生成预支付交易单
+        //注释掉调用接口的代码，weChatPayUtil在common.util里面
+        /*
         JSONObject jsonObject = weChatPayUtil.pay(
                 ordersPaymentDTO.getOrderNumber(), //商户订单号
                 new BigDecimal(0.01), //支付金额，单位 元
-                "苍穹外卖订单", //商品描述
+                "云龙外卖订单", //商品描述
                 user.getOpenid() //微信用户的openid
         );
 
         if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
             throw new OrderBusinessException("该订单已支付");
         }
+         */
 
+        //跳过微信支付的代码
+        log.info("跳过微信支付，支付成功");
+        paySuccess(ordersPaymentDTO.getOrderNumber());
+
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", "ORDERPAID");
+
+        //正常的返回，构造VO
         OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
         vo.setPackageStr(jsonObject.getString("package"));
+
+        //之前构建的直接更新数据库订单状态。paySuccess里面有返回消息和数据库更新
+//        //直接将微信支付的结果写出来
+//        // 支付状态，已支付
+//        Integer OrderPaidStatus = Orders.PAID;
+//        // 订单状态，待接单
+//        Integer OrderStatus = OrderVO.TO_BE_CONFIRMED;
+//        // 支付时间 check_out属性赋值，更新
+//        LocalDateTime check_out_time = LocalDateTime.now();
+//
+//        orderMapper.updateStatus(OrderStatus, OrderPaidStatus, check_out_time, orderId);
 
         return vo;
     }
@@ -249,8 +281,8 @@ public class OrderServiceImpl implements OrderService {
 
         //通过websocket向客户端浏览器推送消息 type orderId content
         Map map = new HashMap();
-        map.put("type",1); // 1表示来单提醒 2表示客户催单
-        map.put("orderId",ordersDB.getId());
+        map.put("type", 1); // 1表示来单提醒 2表示客户催单
+        map.put("orderId", ordersDB.getId());
         map.put("content","订单号：" + outTradeNo);
 
         String json = JSON.toJSONString(map);
@@ -332,6 +364,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
+        // 这里直接简单粗暴设计商家接单后用户无法提起取消。必须电话商家由商家取消
+        // 或许后面可以做一个聊天室来解决这方面的功能？
         if (ordersDB.getStatus() > 2) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
@@ -593,7 +627,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id
      */
     public void reminder(Long id) {
-        // 根据id查询订单
+        // 根据id查询订单，确认有无订单
         Orders ordersDB = orderMapper.getById(id);
 
         // 校验订单是否存在
@@ -602,9 +636,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Map map = new HashMap();
-        map.put("type",2); //1表示来单提醒 2表示客户催单
-        map.put("orderId",id);
-        map.put("content","订单号：" + ordersDB.getNumber());
+        map.put("type", 2); //1表示来单提醒 2表示客户催单
+        map.put("orderId", id);
+        map.put("content", "订单号：" + ordersDB.getNumber());
 
         //通过websocket向客户端浏览器推送消息
         webSocketServer.sendToAllClient(JSON.toJSONString(map));

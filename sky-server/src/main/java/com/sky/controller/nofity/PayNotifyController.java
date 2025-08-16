@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /**
- * 支付回调相关接口
+ * 支付回调相关接口（由微信后台调起）
  */
 @RestController
 @RequestMapping("/notify")
@@ -30,7 +30,7 @@ public class PayNotifyController {
     private WeChatProperties weChatProperties;
 
     /**
-     * 支付成功回调
+     * 支付成功回调，wx直接调用
      *
      * @param request
      */
@@ -54,7 +54,7 @@ public class PayNotifyController {
         //业务处理，修改订单状态、来单提醒
         orderService.paySuccess(outTradeNo);
 
-        //给微信响应
+        //给微信响应，示意已收到支付结果
         responseToWeixin(response);
     }
 
